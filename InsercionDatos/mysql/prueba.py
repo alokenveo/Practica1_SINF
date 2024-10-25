@@ -15,7 +15,7 @@ def fetch_data():
         if connection.is_connected():
             print("Conexión exitosa a la base de datos")
             cursor = connection.cursor()
-            cursor.execute("SELECT * FROM prueba")  # Consulta a la tabla prueba
+            cursor.execute("SELECT * FROM prueba")  # Consulta la tabla prueba
 
             # Recuperar todos los resultados
             records = cursor.fetchall()
