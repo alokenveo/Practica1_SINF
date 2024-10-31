@@ -1,59 +1,68 @@
 package modelos;
 
-import com.datastax.oss.driver.api.core.cql.ResultSet;
-import com.datastax.oss.driver.api.core.cql.Row;
-import com.datastax.oss.driver.api.core.cql.SimpleStatement;
+import java.util.Date;
+
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
 
 public class Consultas {
-    private Conexion conexion;
+	private Conexion conexion;
 
-    public Consultas(Conexion conexion) {
-        this.conexion = conexion;
-    }
+	public Consultas(Conexion conexion) {
+		this.conexion = conexion;
+	}
 
-    public void listarProductosCompradosPorCliente(String clienteId) {
-        String query = "SELECT * FROM compras WHERE cliente_id = ? AND fecha_compra > now() - interval '1' month";
-        ResultSet resultSet = conexion.getSession().execute(SimpleStatement.newInstance(query, clienteId));
+	// Consulta 1: Listar los productos comprados por un cliente (ID de cliente) en
+	// el último mes.
+	public void listarProductosCompradosPorCliente(String clienteId) {
+		String query = "SELECT producto_id, nombre_producto, fecha_compra FROM productos_por_cliente WHERE cliente_id = "
+				+ clienteId+" ALLOW FILTERING";
+		ResultSet resultSet = conexion.getSession().execute(query);
 
-        System.out.println("Productos comprados por el cliente " + clienteId + " en el último mes:");
-        for (Row row : resultSet) {
-            System.out.println(row.getString("producto_id") + ": " + row.getDouble("precio"));
-        }
-    }
+		long dias30EnMillis = 30L * 24 * 60 * 60 * 1000; // 30 días en milisegundos
+		long ahoraEnMillis = System.currentTimeMillis();
 
-    public void obtenerClientesQueCompraronProducto(String productoId) {
-        String query = "SELECT DISTINCT cliente_id FROM compras WHERE producto_id = ? AND fecha_compra > now() - interval '1' year";
-        ResultSet resultSet = conexion.getSession().execute(SimpleStatement.newInstance(query, productoId));
+		System.out.println("Productos comprados por el cliente " + clienteId + " en el último mes:");
+		for (Row row : resultSet) {
+			Date fechaCompra = row.getTimestamp("fecha_compra");
+			if (ahoraEnMillis - fechaCompra.getTime() <= dias30EnMillis) {
+				System.out.println("Producto ID: " + row.getInt("producto_id") + ", Nombre: "
+						+ row.getString("nombre_producto") + ", Fecha: " + fechaCompra);
+			}
+		}
+	}
 
-        System.out.println("Clientes que compraron el producto " + productoId + " en el último año:");
-        for (Row row : resultSet) {
-            System.out.println(row.getString("cliente_id"));
-        }
-    }
+	// Consulta 2: Obtener los clientes que compraron un producto específico en el
+	// último año.
+	public void obtenerClientesQueCompraronProducto(String productoId) {
+	}
 
-    public void listarTop10ProductosPorCategoria(String categoria) {
-        String query = "SELECT producto_id, COUNT(*) AS total_compras FROM compras WHERE categoria = ? GROUP BY producto_id ORDER BY total_compras DESC LIMIT 10";
-        ResultSet resultSet = conexion.getSession().execute(SimpleStatement.newInstance(query, categoria));
+	// Consulta 3: Listar los 10 productos más comprados en una categoría dada.
+	public void listarTop10ProductosPorCategoria(String categoria) {
+		String query = "SELECT producto_id, nombre_producto, num_compras FROM productos_mas_comprados_por_categoria WHERE categoria = '"
+				+ categoria + "' LIMIT 10 ALLOW FILTERING";
+		ResultSet resultSet = conexion.getSession().execute(query);
 
-        System.out.println("Top 10 productos más comprados en la categoría " + categoria + ":");
-        for (Row row : resultSet) {
-            System.out.println(row.getString("producto_id") + ": " + row.getInt("total_compras"));
-        }
-    }
+		System.out.println("Top 10 productos más comprados en la categoría " + categoria + ":");
+		for (Row row : resultSet) {
+			System.out.println("Producto ID: " + row.getInt("producto_id") + ", Nombre: "
+					+ row.getString("nombre_producto") + ", Compras: " + row.getLong("num_compras"));
+		}
+	}
 
-    public void obtenerTotalProductosCompradosPorCliente(String clienteId, String startDate, String endDate) {
-        String query = "SELECT COUNT(*) FROM compras WHERE cliente_id = ? AND fecha_compra >= ? AND fecha_compra <= ?";
-        ResultSet resultSet = conexion.getSession().execute(SimpleStatement.newInstance(query, clienteId, startDate, endDate));
+	// Consulta 4: Obtener el total de productos comprados por un cliente en un
+	// periodo de tiempo.
+	public void obtenerTotalProductosCompradosPorCliente(String clienteId, String fechaInicio, String fechaFin) {
+		String query = "SELECT COUNT(*) FROM productos_por_cliente WHERE cliente_id = " + clienteId
+				+ " AND fecha_compra >= '" + fechaInicio + "' AND fecha_compra <= '" + fechaFin + "'";
 
-        System.out.println("Total de productos comprados por el cliente " + clienteId + " entre " + startDate + " y " + endDate + ": " + resultSet.one().getLong(0));
-    }
+		ResultSet resultSet = conexion.getSession().execute(query);
+		long totalCompras = resultSet.one().getLong(0);
 
-    public void recomendarProductos(String clienteId) {
-        // Implementar lógica de recomendación basada en las compras de otros clientes
-        // Aquí puedes hacer una consulta más compleja para obtener productos recomendados
-        System.out.println("Recomendaciones de productos para el cliente " + clienteId + ":");
-        // Simular recomendaciones
-        System.out.println("Producto recomendado: Producto X");
-    }
+		System.out.println("El total de productos comprados por el cliente " + clienteId + " entre " + fechaInicio
+				+ " y " + fechaFin + ": " + totalCompras);
+	}
+
+	public void recomendarProductos(String clienteId) {
+	}
 }
-

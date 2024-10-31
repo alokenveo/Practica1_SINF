@@ -1,12 +1,18 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>unex.cum</groupId>
-  <artifactId>ConsultasSinfApp</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <name>ConsultasSinfApp</name>
-  <description>Aplicación en Java para realizar consultas en una base de datos Cassandra</description>
-  
-  <properties>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	
+	<groupId>unex.cum</groupId>
+	<artifactId>ConsultasSinfApp</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	
+	<name>ConsultasSinfApp</name>
+	<url>http://maven.apache.org</url>
+	<description>Aplicación en Java para realizar consultas en una base de datos
+		Cassandra</description>
+
+	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>17</maven.compiler.source>
 		<maven.compiler.target>17</maven.compiler.target>
@@ -21,12 +27,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>com.datastax.oss</groupId>
-			<artifactId>java-driver-core</artifactId>
-			<version>4.13.0</version> 
-		</dependency>
-		
 		<dependency>
 			<groupId>com.datastax.cassandra</groupId>
 			<artifactId>cassandra-driver-core</artifactId>
