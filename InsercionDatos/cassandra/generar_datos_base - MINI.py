@@ -65,6 +65,9 @@ try:
         query_insert_producto = "INSERT INTO productos (producto_id, nombre, categoria, precio, calificacion) VALUES (%s, %s, %s, %s, %s)"
         session.execute(query_insert_producto, (producto_id, nombre_producto, categoria, precio, calificacion))
 
+        # Mostrar el progreso en la misma línea
+        print(f"\rClientes añadidos: {i + 1}/{num_productos}", end='')
+
     # Generar un número aleatorio de clientes entre 50 y 75
     num_clientes = random.randint(45, 60)
     print(f"Se han creado un total de {num_clientes} clientes")
@@ -114,15 +117,6 @@ try:
         for nombre_producto, categoria in [(p[1], p[2]) for p in productos if p[0] == producto_id]:
             query_productos_mas_comprados = "INSERT INTO productos_mas_comprados_por_categoria (categoria, producto_id, nombre_producto, num_compras) VALUES (%s, %s, %s, %s)"
             session.execute(query_productos_mas_comprados, (categoria, producto_id, nombre_producto, num_compras))
-
-    # Insertar total_compras_por_cliente
-    for cliente_id in cantidad_compras_cliente:
-        total_compras = cantidad_compras_cliente[cliente_id]
-        periodo_inicio = datetime.now() - timedelta(days=1825)
-        periodo_fin = datetime.now()
-
-        query_total_compras = "INSERT INTO total_compras_por_cliente (cliente_id, periodo_inicio, periodo_fin, total_compras) VALUES (%s, %s, %s, %s)"
-        session.execute(query_total_compras, (cliente_id, periodo_inicio, periodo_fin, total_compras))
 
     # Insertar en recomendaciones_por_cliente
     for _ in range(cant_compras):

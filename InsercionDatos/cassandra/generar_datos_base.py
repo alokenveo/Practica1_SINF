@@ -65,6 +65,9 @@ try:
         query_insert_producto = "INSERT INTO productos (producto_id, nombre, categoria, precio, calificacion) VALUES (%s, %s, %s, %s, %s)"
         session.execute(query_insert_producto, (producto_id, nombre_producto, categoria, precio, calificacion))
 
+        # Mostrar el progreso en la misma línea
+        print(f"\rClientes añadidos: {i + 1}/{num_productos}", end='')
+
     # Generar un número aleatorio de clientes entre 3500 y 4500
     num_clientes = random.randint(3500, 4500)
     print(f"Se han creado un total de {num_clientes} clientes")

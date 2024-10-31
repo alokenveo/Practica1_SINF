@@ -40,7 +40,7 @@ def insertar_datos(client, base_datos, coleccion, cantidad):
     db = client[base_datos]
     collection = db[coleccion]
 
-    for _ in range(cantidad):
+    for i in range(cantidad):
         edad = random.randint(18, 70)  # Edad aleatoria entre 18 y 70 años
         documento = {
             "_id": cliente_id_counter,  # Usar un ID entero secuencial para el cliente
@@ -59,6 +59,10 @@ def insertar_datos(client, base_datos, coleccion, cantidad):
             "metodos_pago": random.sample(["Tarjeta de crédito", "PayPal", "Transferencia bancaria", "Criptomonedas"], k=2)
         }
         collection.insert_one(documento)
+
+        # Mostrar el progreso en la misma línea
+        print(f"\rClientes añadidos: {i + 1}/{cantidad}", end='')
+
         cliente_id_counter += 1  # Incrementar el contador de cliente_id
 
     print(f'Se han insertado {cantidad} documentos en la colección {coleccion}.')

@@ -1,6 +1,6 @@
 from pymongo import MongoClient
 
-def mostrar_documentos(base_datos, coleccion):
+def mostrar_documentos(base_datos, coleccion, limite=5):
     # Conectar al cliente de MongoDB
     client = MongoClient('mongodb://localhost:27017/')  # Cambia la URI si es necesario
 
@@ -10,8 +10,8 @@ def mostrar_documentos(base_datos, coleccion):
     # Seleccionar la colección
     collection = db[coleccion]
 
-    # Obtener todos los documentos de la colección
-    documentos = collection.find()
+    # Obtener los primeros 'limite' documentos de la colección
+    documentos = collection.find().limit(limite)
 
     # Imprimir cada documento
     for documento in documentos:
@@ -22,4 +22,4 @@ def mostrar_documentos(base_datos, coleccion):
 
 
 if __name__ == '__main__':
-    mostrar_documentos('marketing', 'clientes')
+    mostrar_documentos('marketing', 'clientes', 5)
