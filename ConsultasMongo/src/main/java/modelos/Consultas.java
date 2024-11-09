@@ -72,6 +72,7 @@ public class Consultas {
             }
         }
     }
+    
     // Consulta 2: Obtener el perfil de un cliente dado su ID
     public void obtenerPerfilCliente(String clienteId) {
         MongoCollection<Document> collection = database.getCollection("clientes");

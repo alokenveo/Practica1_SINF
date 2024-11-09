@@ -1,7 +1,6 @@
 package modelos;
 
 import java.util.Calendar;
-import java.util.Date;
 
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
@@ -16,42 +15,39 @@ public class Consultas {
 	// Consulta 1: Listar los productos comprados por un cliente (ID de cliente) en
 	// el último mes.
 	public void listarProductosCompradosPorCliente(String clienteId) {
-		String query = "SELECT producto_id, nombre_producto, fecha_compra FROM productos_por_cliente WHERE cliente_id = "
-				+ clienteId + " ALLOW FILTERING";
-		ResultSet resultSet = conexion.getSession().execute(query);
+		Calendar calendar = Calendar.getInstance();
+		calendar.add(Calendar.MONTH, -1);
+		long fechaMesAtras = calendar.getTimeInMillis();
 
-		long dias30EnMillis = 30L * 24 * 60 * 60 * 1000; // 30 días en milisegundos
-		long ahoraEnMillis = System.currentTimeMillis();
+		String query = "SELECT producto_id, nombre_producto, fecha_compra FROM productos_por_cliente WHERE cliente_id = "
+				+ clienteId + " AND fecha_compra>='" + fechaMesAtras + "' ALLOW FILTERING";
+		ResultSet resultSet = conexion.getSession().execute(query);
 
 		System.out.println("Productos comprados por el cliente " + clienteId + " en el último mes:");
 		for (Row row : resultSet) {
-			Date fechaCompra = row.getTimestamp("fecha_compra");
-			if (ahoraEnMillis - fechaCompra.getTime() <= dias30EnMillis) {
-				System.out.println("   Producto ID: " + row.getInt("producto_id") + ", Nombre: "
-						+ row.getString("nombre_producto") + ", Fecha: " + fechaCompra);
-			}
+			System.out.println("   Producto ID: " + row.getInt("producto_id") + ", Nombre: "
+					+ row.getString("nombre_producto") + ", Fecha: " + row.getTimestamp("fecha_compra"));
+
 		}
 	}
 
 	// Consulta 2: Obtener los clientes que compraron un producto específico en el
 	// último año.
 	public void obtenerClientesQueCompraronProducto(String productoId) {
-		String query = "SELECT cliente_id, nombre_cliente, fecha_compra FROM clientes_por_producto WHERE producto_id = "
-				+ productoId + " ALLOW FILTERING";
-		ResultSet resultSet = conexion.getSession().execute(query);
+		Calendar calendar = Calendar.getInstance();
+		calendar.add(Calendar.YEAR, -1);
+		long fechaAnioAtras = calendar.getTimeInMillis();
 
-		long unAnioEnMillis = 365L * 24 * 60 * 60 * 1000; // Un año en milisegundos
-		long ahoraEnMillis = System.currentTimeMillis();
+		String query = "SELECT cliente_id, nombre_cliente, fecha_compra FROM clientes_por_producto WHERE producto_id = "
+				+ productoId + " AND fecha_compra>='" + fechaAnioAtras + "' ALLOW FILTERING";
+		ResultSet resultSet = conexion.getSession().execute(query);
 
 		System.out.println("Clientes que compraron el producto " + productoId + " en el último año:");
 		for (Row row : resultSet) {
-			Date fechaCompra = row.getTimestamp("fecha_compra");
-			// Verifica si la compra fue realizada en el último año
-			if (ahoraEnMillis - fechaCompra.getTime() <= unAnioEnMillis) {
-				System.out.println("   Cliente ID: " + row.getInt("cliente_id") + ", Nombre: "
-						+ row.getString("nombre_cliente") + ", Fecha: " + fechaCompra);
-			}
+			System.out.println("   Cliente ID: " + row.getInt("cliente_id") + ", Nombre: "
+					+ row.getString("nombre_cliente") + ", Fecha: " + row.getTimestamp("fecha_compra"));
 		}
+
 	}
 
 	// Consulta 3: Listar los 10 productos más comprados en una categoría dada.
