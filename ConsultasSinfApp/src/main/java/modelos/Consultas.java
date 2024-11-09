@@ -1,5 +1,6 @@
 package modelos;
 
+import java.util.Calendar;
 import java.util.Date;
 
 import com.datastax.driver.core.ResultSet;
@@ -26,7 +27,7 @@ public class Consultas {
 		for (Row row : resultSet) {
 			Date fechaCompra = row.getTimestamp("fecha_compra");
 			if (ahoraEnMillis - fechaCompra.getTime() <= dias30EnMillis) {
-				System.out.println("Producto ID: " + row.getInt("producto_id") + ", Nombre: "
+				System.out.println("   Producto ID: " + row.getInt("producto_id") + ", Nombre: "
 						+ row.getString("nombre_producto") + ", Fecha: " + fechaCompra);
 			}
 		}
@@ -47,7 +48,7 @@ public class Consultas {
 			Date fechaCompra = row.getTimestamp("fecha_compra");
 			// Verifica si la compra fue realizada en el último año
 			if (ahoraEnMillis - fechaCompra.getTime() <= unAnioEnMillis) {
-				System.out.println("Cliente ID: " + row.getInt("cliente_id") + ", Nombre: "
+				System.out.println("   Cliente ID: " + row.getInt("cliente_id") + ", Nombre: "
 						+ row.getString("nombre_cliente") + ", Fecha: " + fechaCompra);
 			}
 		}
@@ -61,7 +62,7 @@ public class Consultas {
 
 		System.out.println("Top 10 productos más comprados en la categoría " + categoria + ":");
 		for (Row row : resultSet) {
-			System.out.println("Producto ID: " + row.getInt("producto_id") + ", Nombre: "
+			System.out.println("   Producto ID: " + row.getInt("producto_id") + ", Nombre: "
 					+ row.getString("nombre_producto") + ", Compras: " + row.getLong("num_compras"));
 		}
 	}
@@ -79,6 +80,23 @@ public class Consultas {
 				+ " y " + fechaFin + ": " + totalCompras);
 	}
 
+	// Consulta 5: Recomendar productos a un cliente basado en otros clientes que
+	// compraron productos similares en el último mes.
 	public void recomendarProductos(String clienteId) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.add(Calendar.MONTH, -1);
+		long fechaMesAtrasDate = calendar.getTimeInMillis();
+
+		String query = "SELECT * from recomendaciones_por_cliente WHERE cliente_id=" + clienteId
+				+ " AND fecha_compra>='" + fechaMesAtrasDate + "'";
+
+		ResultSet resultSet = conexion.getSession().execute(query);
+
+		for (Row row : resultSet) {
+			System.out.printf(
+					"  Cliente ID: %d, Cliente Similar ID: %d, Producto ID: %d, Nombre producto: %s, Fecha: %s\n",
+					row.getInt("cliente_id"), row.getInt("cliente_similar_id"), row.getInt("producto_id"),
+					row.getString("nombre_producto"), row.getTimestamp("fecha_compra"));
+		}
 	}
 }
