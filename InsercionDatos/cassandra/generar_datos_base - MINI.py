@@ -53,7 +53,7 @@ try:
         print(f"\rProductos creados: {i + 1}/1000", end='')
 
     # Generar clientes y sus compras
-    clientes = [(i + 1, faker.name()) for i in range(random.randint(45, 60))]
+    clientes = [(i + 1, faker.name()) for i in range(random.randint(400, 600))]
     for cliente_id, nombre_cliente in clientes:
         query = "INSERT INTO clientes (cliente_id, nombre) VALUES (%s, %s)"
         session.execute(query, (cliente_id, nombre_cliente))
@@ -63,10 +63,10 @@ try:
     compras_por_cliente = defaultdict(set)
 
     # Crear 5000 compras
-    for _ in range(5000):
+    for i in range(5000):
         cliente_id, _ = random.choice(clientes)
         producto = random.choice(productos)
-        fecha_compra = datetime.now() - timedelta(days=random.randint(0, 1825))
+        fecha_compra = datetime.now() - timedelta(days=random.randint(0, 1095))
 
         # Insertar compra en las tablas
         session.execute(
@@ -81,12 +81,16 @@ try:
         # Registrar compras
         cantidad_compras[producto[0]] += 1
         compras_por_cliente[cliente_id].add(producto[0])
+        print(f"\rCompras realizadas: {i + 1}/1000", end='')
+    print("\n")
 
     # Insertar productos más comprados por categoría
-    for producto_id, num_compras in cantidad_compras.items():
+    for i, (producto_id, num_compras) in enumerate(cantidad_compras.items()):
         nombre_producto, categoria = next((p[1], p[2]) for p in productos if p[0] == producto_id)
         query = "INSERT INTO productos_mas_comprados_por_categoria (categoria, producto_id, nombre_producto, num_compras) VALUES (%s, %s, %s, %s)"
         session.execute(query, (categoria, producto_id, nombre_producto, num_compras))
+        print(f"\rProductos más comprados insertados: {i + 1}/{len(cantidad_compras)}", end='')
+    print("\n")
 
     # Crear recomendaciones basadas en cliente similar
     for cliente_id, productos_comprados in compras_por_cliente.items():
@@ -98,7 +102,7 @@ try:
                     producto_recomendado_id = productos_no_vistos.pop()
                     nombre_producto, categoria = next((p[1], p[2]) for p in productos if p[0] == producto_recomendado_id)
                     query = "INSERT INTO recomendaciones_por_cliente (cliente_id, producto_id, nombre_producto, categoria, fecha_compra, cliente_similar_id) VALUES (%s, %s, %s, %s, %s, %s)"
-                    session.execute(query, (cliente_id, producto_recomendado_id, nombre_producto, categoria, datetime.now(), posible_similar))
+                    session.execute(query, (cliente_id, producto_recomendado_id, nombre_producto, categoria, datetime.now() - timedelta(days=random.randint(0, 365)), posible_similar))
                     break  # Se realiza una sola recomendación
 
     print("\nTablas rellenadas con éxito.")

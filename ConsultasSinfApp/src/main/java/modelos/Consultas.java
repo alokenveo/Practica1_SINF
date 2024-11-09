@@ -65,15 +65,43 @@ public class Consultas {
 
 	// Consulta 4: Obtener el total de productos comprados por un cliente en un
 	// periodo de tiempo.
+
+	/*
+	 * public void obtenerTotalProductosCompradosPorCliente(String clienteId, String
+	 * fechaInicio, String fechaFin) { String query =
+	 * "SELECT COUNT(*) FROM productos_por_cliente WHERE cliente_id = " + clienteId
+	 * + " AND fecha_compra >= '" + fechaInicio + "' AND fecha_compra <= '" +
+	 * fechaFin + "'";
+	 * 
+	 * ResultSet resultSet = conexion.getSession().execute(query); long totalCompras
+	 * = resultSet.one().getLong(0);
+	 * 
+	 * System.out.println("El total de productos comprados por el cliente " +
+	 * clienteId + " entre " + fechaInicio + " y " + fechaFin + ": " +
+	 * totalCompras); }
+	 */
+
 	public void obtenerTotalProductosCompradosPorCliente(String clienteId, String fechaInicio, String fechaFin) {
-		String query = "SELECT COUNT(*) FROM productos_por_cliente WHERE cliente_id = " + clienteId
-				+ " AND fecha_compra >= '" + fechaInicio + "' AND fecha_compra <= '" + fechaFin + "'";
+		// Consulta para obtener los productos comprados por el cliente en el rango de
+		// fechas
+		String query = "SELECT producto_id, nombre_producto FROM productos_por_cliente " + "WHERE cliente_id = "
+				+ clienteId + " AND fecha_compra >= '" + fechaInicio + "' AND fecha_compra <= '" + fechaFin + "'";
 
 		ResultSet resultSet = conexion.getSession().execute(query);
-		long totalCompras = resultSet.one().getLong(0);
 
-		System.out.println("El total de productos comprados por el cliente " + clienteId + " entre " + fechaInicio
+		// Obtenemos el total de filas devueltas
+		int totalCompras = resultSet.getAvailableWithoutFetching(); // Este método te da el número de filas sin tener
+																	// que recorrer todo el conjunto de resultados
+
+		// Mostrar el total de productos comprados
+		System.out.println("\nEl total de productos comprados por el cliente " + clienteId + " entre " + fechaInicio
 				+ " y " + fechaFin + ": " + totalCompras);
+
+		// Recorremos las filas devueltas para mostrar los detalles de los productos
+		System.out.println("Detalles de los productos comprados:");
+		for (Row row : resultSet) {
+			System.out.printf("   Producto ID: %d, Nombre: %s\n", row.getInt("producto_id"), row.getString("nombre_producto"));
+		}
 	}
 
 	// Consulta 5: Recomendar productos a un cliente basado en otros clientes que
