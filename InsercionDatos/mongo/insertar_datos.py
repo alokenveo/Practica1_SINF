@@ -19,7 +19,7 @@ def generar_historial_compras():
             "nombre_producto": fake.word().capitalize(),
             "precio": round(random.uniform(10.0, 500.0), 2),  # Precio aleatorio entre 10 y 500
             "fecha_compra": fake.date_time_between(start_date='-2y', end_date='now').isoformat() + 'Z', #Desde hace dos años
-            "categoria": random.choice(["Electrónica", "Deportes", "Hogar", "Moda", "Juguetes", "Belleza", "Automotriz", "Jardinería"])
+            "categoria": random.choice(["Electrónica", "Deportes", "Hogar", "Moda", "Juguetes", "Belleza", "Automotriz", "Jardinería"]),
             "calificacion": round(random.uniform(1, 5), 1)  # Calificación aleatoria entre 1 y 5
         }
         historial.append(compra)
