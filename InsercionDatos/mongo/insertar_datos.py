@@ -13,12 +13,12 @@ def generar_historial_compras():
     """Genera un historial de compras aleatorio."""
     global producto_id_counter
     historial = []
-    for _ in range(random.randint(1, 21)):  # Entre 1 y 20 compras
+    for _ in range(random.randint(3, 20)):  # Entre 3 y 20 compras
         compra = {
             "producto_id": producto_id_counter,  # Usar un ID entero secuencial para el producto
             "nombre_producto": fake.word().capitalize(),
             "precio": round(random.uniform(10.0, 500.0), 2),  # Precio aleatorio entre 10 y 500
-            "fecha_compra": fake.date_time_this_year().isoformat() + 'Z',
+            "fecha_compra": fake.date_time_between(start_date='-2y', end_date='now').isoformat() + 'Z', #Desde hace dos años
             "categoria": random.choice(["Electrónica", "Deportes", "Hogar", "Moda"]),
             "calificacion": round(random.uniform(1, 5), 1)  # Calificación aleatoria entre 1 y 5
         }
@@ -65,7 +65,7 @@ def insertar_datos(client, base_datos, coleccion, cantidad):
 
         cliente_id_counter += 1  # Incrementar el contador de cliente_id
 
-    print(f'Se han insertado {cantidad} documentos en la colección {coleccion}.')
+    print(f"\nSe han insertado {cantidad} documentos en la colección {coleccion}.")
 
 
 if __name__ == '__main__':
