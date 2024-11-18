@@ -32,9 +32,10 @@ try:
 
     producto_count = Counter()  # Conteo de productos base para sufijos
     productos = []
+    num_productos=100
 
     # Generar y almacenar 1000 productos
-    for i in range(1000):
+    for i in range(num_productos):
         categoria = random.choice(list(productos_por_categoria.keys()))
         nombre_base = random.choice(productos_por_categoria[categoria])
 
@@ -50,20 +51,24 @@ try:
         # Insertar producto en 'productos'
         query = "INSERT INTO productos (producto_id, nombre, categoria, precio, calificacion) VALUES (%s, %s, %s, %s, %s)"
         session.execute(query, (i + 1, nombre_producto, categoria, precio, calificacion))
-        print(f"\rProductos creados: {i + 1}/1000", end='')
+        print(f"\rProductos creados: {i + 1}/{num_productos}", end='')
+    print("\n")
 
     # Generar clientes y sus compras
-    clientes = [(i + 1, faker.name()) for i in range(random.randint(400, 600))]
+    num_clientes=random.randint(40, 60)
+    clientes = [(i + 1, faker.name()) for i in range(num_clientes)]
     for cliente_id, nombre_cliente in clientes:
         query = "INSERT INTO clientes (cliente_id, nombre) VALUES (%s, %s)"
         session.execute(query, (cliente_id, nombre_cliente))
+    print(f"Se han introducido {num_clientes} clientes")
 
     # Contador de compras por producto y cliente
     cantidad_compras = Counter()
     compras_por_cliente = defaultdict(set)
+    cant_compras=500
 
     # Crear 5000 compras
-    for i in range(5000):
+    for i in range(cant_compras):
         cliente_id, _ = random.choice(clientes)
         producto = random.choice(productos)
         fecha_compra = datetime.now() - timedelta(days=random.randint(0, 1095))
@@ -81,7 +86,7 @@ try:
         # Registrar compras
         cantidad_compras[producto[0]] += 1
         compras_por_cliente[cliente_id].add(producto[0])
-        print(f"\rCompras realizadas: {i + 1}/1000", end='')
+        print(f"\rCompras realizadas: {i + 1}/{cant_compras}", end='')
     print("\n")
 
     # Insertar productos más comprados por categoría
@@ -93,17 +98,54 @@ try:
     print("\n")
 
     # Crear recomendaciones basadas en cliente similar
-    for cliente_id, productos_comprados in compras_por_cliente.items():
-        productos_no_vistos = None
-        for posible_similar, productos_similares in compras_por_cliente.items():
-            if posible_similar != cliente_id:
-                productos_no_vistos = productos_similares - productos_comprados
-                if productos_no_vistos:
-                    producto_recomendado_id = productos_no_vistos.pop()
-                    nombre_producto, categoria = next((p[1], p[2]) for p in productos if p[0] == producto_recomendado_id)
-                    query = "INSERT INTO recomendaciones_por_cliente (cliente_id, producto_id, nombre_producto, categoria, fecha_compra, cliente_similar_id) VALUES (%s, %s, %s, %s, %s, %s)"
-                    session.execute(query, (cliente_id, producto_recomendado_id, nombre_producto, categoria, datetime.now() - timedelta(days=random.randint(0, 365)), posible_similar))
-                    break  # Se realiza una sola recomendación
+    # Diccionario para almacenar productos por cliente
+    productos_por_cliente = defaultdict(set)
+    productos_base_por_cliente = defaultdict(set)
+
+    # Paso 1: Construir datos base
+    for cliente_id, compras in compras_por_cliente.items():
+        for producto_id in compras:
+            producto_data = next(p for p in productos if p[0] == producto_id)
+            producto_base = producto_data[1].split(" ")[0]  # Extraer nombre base
+            productos_por_cliente[cliente_id].add(producto_id)
+            productos_base_por_cliente[cliente_id].add(producto_base)
+
+    # Paso 2: Generar recomendaciones
+    for cliente_id, nombres_base_actual in productos_base_por_cliente.items():
+        if not nombres_base_actual:
+            continue  # Si el cliente no tiene compras, pasamos al siguiente
+
+        # Buscar un cliente similar
+        cliente_similar_id = None
+        productos_cliente_similar = set()
+        for otro_cliente_id, nombres_base_otro in productos_base_por_cliente.items():
+            if cliente_id == otro_cliente_id:
+                continue  # No comparar con el mismo cliente
+            if nombres_base_actual.issubset(nombres_base_otro):
+                productos_cliente_similar = productos_por_cliente[otro_cliente_id]
+                cliente_similar_id = otro_cliente_id
+                break
+
+        if not cliente_similar_id:
+            continue  # Si no hay cliente similar, pasamos al siguiente
+
+        # Identificar productos a recomendar
+        productos_a_recomendar = productos_cliente_similar - productos_por_cliente[cliente_id]
+        for producto_id in productos_a_recomendar:
+            producto_data = next(p for p in productos if p[0] == producto_id)
+            fecha_compra = datetime.now() - timedelta(days=random.randint(0, 1095))
+            query = """
+            INSERT INTO marketing.recomendaciones_por_cliente (cliente_id, fecha_compra, producto_id, categoria, cliente_similar_id, nombre_producto)
+            VALUES (%s, %s, %s, %s, %s, %s)
+            """
+            session.execute(query, (
+                cliente_id,
+                fecha_compra,
+                producto_id,
+                producto_data[2],  # Categoría
+                cliente_similar_id,
+                producto_data[1]  # Nombre del producto
+            ))
 
     print("\nTablas rellenadas con éxito.")
 
