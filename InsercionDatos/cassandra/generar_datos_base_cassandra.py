@@ -69,7 +69,7 @@ try:
 
     # Crear 50000 compras
     for i in range(cant_compras):
-        cliente_id, _ = random.choice(clientes)
+        cliente_id, nombre_cliente = random.choice(clientes)
         producto = random.choice(productos)
         fecha_compra = datetime.now() - timedelta(days=random.randint(0, 1095))
 

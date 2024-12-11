@@ -63,24 +63,6 @@ public class Consultas {
 		}
 	}
 
-	// Consulta 4: Obtener el total de productos comprados por un cliente en un
-	// periodo de tiempo.
-
-	/*
-	 * public void obtenerTotalProductosCompradosPorCliente(String clienteId, String
-	 * fechaInicio, String fechaFin) { String query =
-	 * "SELECT COUNT(*) FROM productos_por_cliente WHERE cliente_id = " + clienteId
-	 * + " AND fecha_compra >= '" + fechaInicio + "' AND fecha_compra <= '" +
-	 * fechaFin + "'";
-	 * 
-	 * ResultSet resultSet = conexion.getSession().execute(query); long totalCompras
-	 * = resultSet.one().getLong(0);
-	 * 
-	 * System.out.println("El total de productos comprados por el cliente " +
-	 * clienteId + " entre " + fechaInicio + " y " + fechaFin + ": " +
-	 * totalCompras); }
-	 */
-
 	public void obtenerTotalProductosCompradosPorCliente(String clienteId, String fechaInicio, String fechaFin) {
 		// Consulta para obtener los productos comprados por el cliente en el rango de
 		// fechas
