@@ -18,7 +18,7 @@ def generar_historial_compras():
             "producto_id": producto_id_counter,  # Usar un ID entero secuencial para el producto
             "nombre_producto": fake.word().capitalize(),
             "precio": round(random.uniform(10.0, 500.0), 2),  # Precio aleatorio entre 10 y 500
-            "fecha_compra": fake.date_time_between(start_date='-2y', end_date='now').isoformat() + 'Z', #Desde hace dos años
+            "fecha_compra": fake.date_time_between(start_date='-2y', end_date='now'), #Desde hace dos años
             "categoria": random.choice(["Electrónica", "Deportes", "Hogar", "Moda", "Juguetes", "Belleza", "Automotriz", "Jardinería"]),
             "calificacion": round(random.uniform(1, 5), 1)  # Calificación aleatoria entre 1 y 5
         }
@@ -70,7 +70,7 @@ def insertar_datos(client, base_datos, coleccion, cantidad):
 
 if __name__ == '__main__':
     # Conectar al cliente de MongoDB
-    client = MongoClient('mongodb://localhost:27017/')
+    client = MongoClient('mongodb://localhost:27017/') 
 
     # Insertar 10 documentos aleatorios
     insertar_datos(client, 'marketing', 'clientes', 50000)

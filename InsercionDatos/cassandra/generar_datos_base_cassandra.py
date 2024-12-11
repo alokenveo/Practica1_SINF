@@ -55,7 +55,7 @@ try:
     print("\n")
 
     # Generar clientes y sus compras
-    num_clientes=random.randint(3000, 4000)
+    num_clientes=random.randint(4500, 6000)
     clientes = [(i + 1, faker.name()) for i in range(num_clientes)]
     for cliente_id, nombre_cliente in clientes:
         query = "INSERT INTO clientes (cliente_id, nombre) VALUES (%s, %s)"
