@@ -32,9 +32,9 @@ try:
 
     producto_count = Counter()  # Conteo de productos base para sufijos
     productos = []
-    num_productos=10000
+    num_productos=1000
 
-    # Generar y almacenar 10000 productos
+    # Generar y almacenar 1000 productos
     for i in range(num_productos):
         categoria = random.choice(list(productos_por_categoria.keys()))
         nombre_base = random.choice(productos_por_categoria[categoria])
@@ -55,7 +55,7 @@ try:
     print("\n")
 
     # Generar clientes y sus compras
-    num_clientes=random.randint(4500, 6000)
+    num_clientes=random.randint(450, 600)
     clientes = [(i + 1, faker.name()) for i in range(num_clientes)]
     for cliente_id, nombre_cliente in clientes:
         query = "INSERT INTO clientes (cliente_id, nombre) VALUES (%s, %s)"
@@ -65,9 +65,9 @@ try:
     # Contador de compras por producto y cliente
     cantidad_compras = Counter()
     compras_por_cliente = defaultdict(set)
-    cant_compras=50000
+    cant_compras=5000
 
-    # Crear 50000 compras
+    # Crear 5000 compras
     for i in range(cant_compras):
         cliente_id, nombre_cliente = random.choice(clientes)
         producto = random.choice(productos)
@@ -112,7 +112,7 @@ try:
 
     # Paso 2: Generar recomendaciones
     for cliente_id, nombres_base_actual in productos_base_por_cliente.items():
-        if not nombres_base_actual:
+        if not nombres_base_actual: 
             continue  # Si el cliente no tiene compras, pasamos al siguiente
 
         # Buscar un cliente similar
@@ -148,6 +148,8 @@ try:
             ))
 
     print("\nTablas rellenadas con éxito.")
+    
+    
 
 except Exception as e:
     print("Error al conectar:", e)

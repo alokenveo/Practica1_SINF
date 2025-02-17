@@ -82,7 +82,8 @@ public class Consultas {
 		// Recorremos las filas devueltas para mostrar los detalles de los productos
 		System.out.println("Detalles de los productos comprados:");
 		for (Row row : resultSet) {
-			System.out.printf("   Producto ID: %d, Nombre: %s\n", row.getInt("producto_id"), row.getString("nombre_producto"));
+			System.out.printf("   Producto ID: %d, Nombre: %s\n", row.getInt("producto_id"),
+					row.getString("nombre_producto"));
 		}
 	}
 
@@ -105,4 +106,20 @@ public class Consultas {
 					row.getString("nombre_producto"), row.getTimestamp("fecha_compra"));
 		}
 	}
+
+	// DEFENSA
+	// Consulta 6: Lista los productos más caros por categoría
+	public void listarProductosMasCarosPorCategoria(String categoria) {
+		String query = "SELECT producto_id, nombre_producto, precio FROM productos_mas_caros_por_categoria WHERE categoria = '"
+				+ categoria + "' LIMIT 10";
+
+		ResultSet resultSet = conexion.getSession().execute(query);
+
+		System.out.println("Productos más caros en la categoría " + categoria + ":");
+		for (Row row : resultSet) {
+			System.out.printf("   Producto ID: %d, Nombre: %s, Precio: %.2f\n", row.getInt("producto_id"),
+					row.getString("nombre_producto"), row.getDecimal("precio"));
+		}
+	}
+
 }
